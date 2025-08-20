@@ -3,8 +3,11 @@ import sequelize from '../sequelize';
 
 export class UserModel extends Model {
   public id!: string;
-  public name!: string;
+  public firstName!: string;
+  public lastName!: string;
   public email!: string;
+  public password!: string;
+  public isVerified!: boolean
 }
 
 UserModel.init(
@@ -14,8 +17,11 @@ UserModel.init(
       defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
     },
-    name: { type: DataTypes.STRING, allowNull: false },
+    firstName: { type: DataTypes.STRING, allowNull: false },
+    lastName: { type: DataTypes.STRING, allowNull: false },
     email: { type: DataTypes.STRING, allowNull: false, unique: true },
+    password: {type: DataTypes.STRING, allowNull: false},
+    isVerified : {type: DataTypes.BOOLEAN, defaultValue: false}
   },
   {
     sequelize,

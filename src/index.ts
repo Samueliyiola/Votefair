@@ -6,7 +6,7 @@ const PORT = process.env.PORT || 4000;
 
 async function bootstrap() {
   try {
-    await sequelize.authenticate();
+    await sequelize.sync({ alter: true });
     console.log('✅ Database connected');
   } catch (err) {
     console.error('❌ Unable to connect to DB', err);

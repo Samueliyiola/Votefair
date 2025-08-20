@@ -1,7 +1,13 @@
 type User {
   id: ID!
-  name: String!
+  firstName: String!
+  lastName: String!
   email: String!
+  isVerified: Boolean!
+}
+
+type AuthPayload {
+  token: String!
 }
 
 type Query {
@@ -10,5 +16,26 @@ type Query {
 }
 
 type Mutation {
-  createUser(name: String!, email: String!): User!
+  signup(
+    firstName: String!
+    lastName: String!
+    email: String!
+    password: String!
+  ): User!
+  login(email: String!, password: String!): AuthPayload!
 }
+
+# type User {
+#   id: ID!
+#   name: String!
+#   email: String!
+# }
+
+# type Query {
+#   users: [User!]!
+#   user(id: ID!): User
+# }
+
+# type Mutation {
+#   createUser(name: String!, email: String!): User!
+# }
