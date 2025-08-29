@@ -7,7 +7,8 @@ export class UserModel extends Model {
   public lastName!: string;
   public email!: string;
   public password!: string;
-  public isVerified!: boolean
+  // public isVerified!: boolean;
+  public isAdmin!: boolean;
 }
 
 UserModel.init(
@@ -21,7 +22,8 @@ UserModel.init(
     lastName: { type: DataTypes.STRING, allowNull: false },
     email: { type: DataTypes.STRING, allowNull: false, unique: true },
     password: {type: DataTypes.STRING, allowNull: false},
-    isVerified : {type: DataTypes.BOOLEAN, defaultValue: false}
+    // isVerified : {type: DataTypes.BOOLEAN, defaultValue: false},
+    isAdmin: {type: DataTypes.BOOLEAN, defaultValue: false}
   },
   {
     sequelize,

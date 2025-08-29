@@ -15,13 +15,13 @@ export class UserRepositorySequelize implements IUserRepository {
       lastName: user.lastName,
       email: user.email,
       password: user.password,
-      isVerified: user.isVerified
+      isAdmin: user.isAdmin
     });
-    return new User(created.id, created.firstName, created.lastName, created.email, created.password, created.isVerified);
+    return new User(created.id, created.firstName, created.lastName, created.email, created.password, created.isAdmin);
   }
 
   async findAll(): Promise<User[]> {
     const users = await UserModel.findAll();
-    return users.map(u => new User(u.id, u.firstName, u.lastName, u.email, u.password, u.isVerified));
+    return users.map(u => new User(u.id, u.firstName, u.lastName, u.email, u.password, u.isAdmin));
   }
 }

@@ -3,7 +3,7 @@ type User {
   firstName: String!
   lastName: String!
   email: String!
-  isVerified: Boolean!
+  isAdmin: Boolean!
 }
 
 type AuthPayload {
@@ -21,6 +21,7 @@ type Mutation {
     lastName: String!
     email: String!
     password: String!
+    isAdmin: Boolean
   ): User!
   login(email: String!, password: String!): AuthPayload!
 }

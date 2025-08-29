@@ -5,7 +5,8 @@ export class User {
     public lastName: string,
     public email: string,
     public password: string,
-    public isVerified: boolean = false //default to false
+    // public isVerified: boolean = false, //default to false
+    public isAdmin: boolean = false // default to false
   ) {}
 
   // example domain rule

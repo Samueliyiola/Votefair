@@ -1,12 +1,12 @@
 import { Sequelize } from 'sequelize';
-
+import {env} from "../../shared"
 const sequelize = new Sequelize(
-  process.env.DATABASE_NAME || 'postgres',
-  process.env.DATABASE_USER || 'postgres',
-  process.env.DATABASE_PASSWORD || 'postgres',
+  env.DATABASE_NAME || 'postgres',
+  env.DATABASE_USER || 'postgres',
+  env.DATABASE_PASSWORD || 'postgres',
   {
-    host: process.env.DATABASE_HOST || 'localhost',
-    port: +(process.env.DATABASE_PORT || 5432),
+    host: env.DATABASE_HOST || 'localhost',
+    port: +(env.DATABASE_PORT || 5432),
     dialect: 'postgres',
     logging: false,
   }

@@ -5,7 +5,7 @@ import { User } from "../../../domain/entities/User";
 export class SignupService {
   constructor(private userRepository: IUserRepository) {}
 
-  async execute(email: string, password: string, firstName: string, lastName: string): Promise<User> {
+  async execute(email: string, password: string, firstName: string, lastName: string, isAdmin: boolean): Promise<User> {
     const existingUser = await this.userRepository.findByEmail(email);
     if (existingUser) {
       throw new Error("User already exists with this email");
@@ -17,7 +17,8 @@ export class SignupService {
       firstName,
       lastName,
       email,
-      hashedPassword
+      hashedPassword,
+      isAdmin
     );
 
     return this.userRepository.save(newUser);

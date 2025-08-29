@@ -11,8 +11,8 @@ export const userResolvers = {
     users: async () => userRepository.findAll(),
   },
   Mutation: {
-    signup: async (_: any, { email, password, firstName, lastName }: any) => {
-      return signupService.execute(email, password, firstName, lastName);
+    signup: async (_: any, { email, password, firstName, lastName, isAdmin }: any) => {
+      return signupService.execute(email, password, firstName, lastName, isAdmin);
     },
     login: async (_: any, { email, password }: any) => {
       return loginService.execute(email, password);
