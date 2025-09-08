@@ -1,7 +1,7 @@
 export class Question{
     constructor(
-        id: string,
-        pollId: string,
-        text: string
+        public id: string,
+        public pollId: string,
+        public text: string
     ){}
 }

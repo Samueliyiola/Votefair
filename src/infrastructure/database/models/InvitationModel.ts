@@ -5,7 +5,8 @@ export class InvitationModel extends Model {
   declare id: string;
   declare pollId: string;
   declare email: string;
-  declare token: string | null;
+  // declare token: string | null;
+  declare token: string;
   declare used: boolean;
   declare createdAt: Date;
 }

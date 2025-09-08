@@ -1,10 +1,10 @@
 export class Invitation {
     constructor(
-        id: string,
-        pollId: string,
-        email: string,
-        token?: string,
-        used?: boolean,
-        createdAt?: Date
+        public id: string,
+        public pollId: string,
+        public email: string,
+        public token?: string,
+        public used?: boolean,
+        // public createdAt?: Date
     ) {}
 }

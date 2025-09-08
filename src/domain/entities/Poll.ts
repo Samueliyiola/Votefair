@@ -2,15 +2,15 @@ type PollAccessType = 'OPEN' | 'CLOSED';
 
 export class Poll {
     constructor(
-        id: string,
-        title: string,
-        // description?: string | null,
-        createdBy: string, // user id
-        accessType: PollAccessType,
-        allowInviteEmails: boolean,       
-        options: string[], // option texts (for convenience)
-        invitedEmails?: string[], // stored on model for quick access
-        createdAt?: Date,
-        updatedAt?: Date
+        public id: string,
+        public title: string,
+        // public description?: string | null,
+        public createdBy: string, // user id
+        public accessType: PollAccessType,
+        public allowInviteEmails: boolean,
+        public options: string[], // option texts (for convenience)
+        public invitedEmails?: string[], // stored on model for quick access
+        public createdAt?: Date,
+        public updatedAt?: Date
     ) {}
 }

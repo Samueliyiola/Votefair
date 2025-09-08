@@ -1,10 +1,10 @@
 export class Vote{
     constructor(
-        id: string,
-        pollId: string,
-        questionId: string,
-        optionId: string,
-        userId: string,
-        createdAt?: Date
+        public id: string,
+        public pollId: string,
+        public questionId: string,
+        public optionId: string,
+        public userId: string,
+        public createdAt?: Date
     ){}
 }

@@ -1,7 +1,7 @@
 export class Option{
     constructor(
-        id: string,
-        questionId: string,
-        text: string
+        public id: string,
+        public questionId: string,
+        public text: string
     ){}
 }

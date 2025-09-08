@@ -3,6 +3,11 @@ import { User } from "../../domain/entities/User";
 import { UserModel } from "../database/models/UserModel";
 
 export class UserRepositorySequelize implements IUserRepository {
+  async findById(id: string): Promise<User | null> {
+    const user = await UserModel.findByPk(id);
+    return user;
+  }
+  
   async findByEmail(email: string): Promise<User | null> {
     const user = await UserModel.findOne({ where: { email } });
     return user;
