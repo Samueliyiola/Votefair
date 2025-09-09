@@ -1,0 +1,248 @@
+# src/infrastructure/graphql/typeDefs/poll.graphql
+type Poll {
+  id: ID!
+  title: String!
+  createdBy: User!
+  accessType: PollAccessType!
+  allowInviteEmails: Boolean!
+  options: [String!]!
+  invitedEmails: [String!]
+  questions: [Question!]!
+  votes: [Vote!]!
+  createdAt: String!
+  updatedAt: String!
+}
+
+type Question {
+  id: ID!
+  poll: Poll!
+  text: String!
+  options: [Option!]!
+  votes: [Vote!]!
+}
+
+type Option {
+  id: ID!
+  question: Question!
+  text: String!
+  votes: [Vote!]!
+  voteCount: Int!
+}
+
+type Vote {
+  id: ID!
+  poll: Poll!
+  question: Question!
+  option: Option!
+  user: User!
+  createdAt: String!
+}
+
+type Invitation {
+  id: ID!
+  poll: Poll!
+  email: String!
+  token: String!
+  used: Boolean!
+  createdAt: String!
+}
+
+enum PollAccessType {
+  OPEN
+  CLOSED
+}
+
+# Input types
+input CreatePollInput {
+  title: String!
+  accessType: PollAccessType!
+  allowInviteEmails: Boolean!
+  questions: [QuestionInput!]!
+  invitedEmails: [String!]
+}
+
+input QuestionInput {
+  text: String!
+  options: [String!]!
+}
+
+input VoteInput {
+  pollId: ID!
+  questionId: ID!
+  optionId: ID!
+  inviteToken: String
+}
+
+# Response types
+type CreatePollResponse {
+  poll: Poll!
+  questions: [Question!]!
+  options: [Option!]!
+  inviteTokens: [String!]!
+}
+
+# Queries
+type Query {
+  # Get all polls for the authenticated user
+  polls: [Poll!]!
+
+  # Get a specific poll by ID
+  poll(id: ID!): Poll
+
+  # Get polls created by the current user
+  myPolls: [Poll!]!
+
+  # Get results for a specific poll (votes)
+  pollResults(pollId: ID!): [Vote!]!
+
+  # Get invitations for a poll
+  pollInvitations(pollId: ID!): [Invitation!]!
+
+  # Get questions for a poll
+  pollQuestions(pollId: ID!): [Question!]!
+
+  # Get options for a question
+  questionOptions(questionId: ID!): [Option!]!
+
+  # Get votes for a poll
+  pollVotes(pollId: ID!): [Vote!]!
+
+  # Get votes for a question
+  questionVotes(questionId: ID!): [Vote!]!
+
+  # Get votes for an option
+  optionVotes(optionId: ID!): [Vote!]!
+
+  # Get user's votes in a poll
+  userPollVotes(pollId: ID!): [Vote!]!
+
+  # Check if an invitation is valid
+  checkInvitation(token: String!): Invitation
+}
+
+# Mutations
+type Mutation {
+  # Create a new poll
+  createPoll(input: CreatePollInput!): CreatePollResponse!
+
+  # Vote on a poll
+  vote(input: VoteInput!): Boolean!
+
+  # Close a poll (stop accepting votes)
+  closePoll(pollId: ID!): Poll!
+
+  # Reopen a poll (start accepting votes again)
+  reopenPoll(pollId: ID!): Poll!
+
+  # Update poll details
+  updatePoll(pollId: ID!, input: UpdatePollInput!): Poll!
+
+  # Create an invitation for a poll
+  createInvitation(pollId: ID!, email: String!): Invitation!
+
+  # Create multiple invitations
+  createInvitations(pollId: ID!, emails: [String!]!): [Invitation!]!
+
+  # Revoke an invitation
+  revokeInvitation(invitationId: ID!): Boolean!
+
+  # Create a question for a poll
+  createQuestion(pollId: ID!, text: String!): Question!
+
+  # Create an option for a question
+  createOption(questionId: ID!, text: String!): Option!
+
+  # Delete a poll
+  deletePoll(pollId: ID!): Boolean!
+}
+
+# Additional input types
+input UpdatePollInput {
+  title: String
+  accessType: PollAccessType
+  allowInviteEmails: Boolean
+  invitedEmails: [String!]
+}
+
+# Subscriptions (for real-time updates)
+type Subscription {
+  # Subscribe to new votes in a poll
+  voteAdded(pollId: ID!): Vote!
+
+  # Subscribe to poll updates
+  pollUpdated(pollId: ID!): Poll!
+
+  # Subscribe to new invitations
+  invitationCreated(pollId: ID!): Invitation!
+}
+
+# # src/infrastructure/graphql/typeDefs/poll.graphql
+# scalar Upload
+
+# enum PollAccessType {
+#   OPEN
+#   CLOSED
+# }
+
+# type Poll {
+#   id: ID!
+#   title: String!
+#   description: String
+#   createdBy: ID!
+#   accessType: PollAccessType!
+#   allowInviteEmails: Boolean!
+#   invitedEmails: [String!]!
+#   createdAt: String
+#   updatedAt: String
+# }
+
+# type Question {
+#   id: ID!
+#   pollId: ID!
+#   text: String!
+# }
+
+# type Option {
+#   id: ID!
+#   questionId: ID!
+#   text: String!
+# }
+
+# type Vote {
+#   id: ID!
+#   pollId: ID!
+#   questionId: ID!
+#   optionId: ID!
+#   userId: ID!
+#   createdAt: String
+# }
+
+# input QuestionInput {
+#   text: String!
+#   options: [String!]!
+# }
+
+# input CreatePollInput {
+#   title: String!
+#   description: String
+#   accessType: PollAccessType!
+#   allowInviteEmails: Boolean
+#   questions: [QuestionInput!]!
+#   invitedEmails: [String!] # optional; used when CLOSED
+# }
+
+# type CreatePollResult {
+#   poll: Poll!
+#   invitedCount: Int!
+# }
+
+# type Query {
+#   pollsForUser: [Poll!]!
+#   poll(id: ID!): Poll
+# }
+
+# type Mutation {
+#   # CSV upload: file should be a CSV with header 'email' or single-column list
+#   createPollWithCSV(input: CreatePollInput!, file: Upload!): CreatePollResult!
+#   vote(pollId: ID!, questionId: ID!, optionId: ID!): Vote!
+# }

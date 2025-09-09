@@ -7,14 +7,14 @@ export class LoginService {
 
   async execute(email: string, password: string): Promise<{ token: string }> {
     const user = await this.userRepository.findByEmail(email);
-    // if (!user) throw new Error("Invalid credentials");
-    if (!user) throw new Error("Email not found!");
+    if (!user) throw new Error("Invalid credentials");
+
 
     const isValid = await bcrypt.compare(password, user.password);
     if (!isValid) throw new Error("Invalid credentials");
 
     const token = jwt.sign(
-      { userId: user.id, email: user.email },
+      { userId: user.id, email: user.email, isAdmin: user.isAdmin },
       process.env.JWT_SECRET as string,
       { expiresIn: "1d" }
     );

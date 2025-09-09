@@ -13,6 +13,6 @@ const sequelize = new Sequelize(
   }
 );
 
-setupAssociations();
+// setupAssociations();
 
 export default sequelize;

@@ -1,10 +1,5 @@
-// src/domain/repositories/IPollRepository.ts
-// import { Poll, Question, Option, Vote, Invitation } from '../entities';
-import {Poll} from '../entities/Poll';
-import {Question} from '../entities/Question';
-import {Option} from '../entities/Option';
-import {Vote} from '../entities/Vote';
-import {Invitation} from '../entities/Invitation';
+import { Poll, Question, Option, Vote, Invitation } from '../entities';
+
 export interface IPollRepository {
   // Poll operations
   createPoll(poll: Omit<Poll, 'id' | 'createdAt' | 'updatedAt'>): Promise<Poll>;
