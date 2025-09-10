@@ -16,6 +16,7 @@ export async function createServer() {
         typeDefs,
         resolvers,
         context: ({ req }: { req: AuthenticatedRequest }): GraphQLContext => {
+            // console.log('Context content:', req.user);
             return { user: req.user };
         },
     });

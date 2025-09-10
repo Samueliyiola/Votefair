@@ -17,17 +17,18 @@ export const authenticateToken = (req: AuthenticatedRequest, res: Response, next
   if (!authHeader) {
     return next();
   }
+  //console.log('Auth Header:', authHeader); To check for an issue
   const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
 
   if (!token) {
-    throw new Error('Authentication token is missing');
-    // return next();
+    // throw new Error('Authentication token is missing');
+    return next();
   }
 
   try {
     const decoded = jwt.verify(token, env.JWT_SECRET) as any;
     req.user = {
-      id: decoded.id,
+      id: decoded.userId,
       email: decoded.email,
       isAdmin: decoded.isAdmin,
 

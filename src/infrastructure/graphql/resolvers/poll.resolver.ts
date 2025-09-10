@@ -1,24 +1,25 @@
 // src/infrastructure/graphql/resolvers/poll.resolver.ts
 import { CreatePollService } from '../../../application/services/poll/CreatePollService';
 import { VoteService } from '../../../application/services/vote/VoteService';
-import { IPollRepository } from '../../../domain/repositories/IPollRepository';
-import { IUserRepository } from '../../../domain/repositories/IUserRepository';
+import {UserRepositorySequelize} from "../../repositories/UserRepositorySequelize";
+import { PollRepositorySequelize } from '../../repositories/PollRepositorySequelize';
 
 interface GraphQLContext {
   user?: {
     id: string;
     email: string;
+    isAdmin: boolean;
   };
 }
 
-export const createPollResolvers = (
-  pollRepository: IPollRepository,
-  userRepository: IUserRepository
-) => {
-  const createPollService = new CreatePollService(pollRepository);
-  const voteService = new VoteService(pollRepository, userRepository);
+const pollRepository = new PollRepositorySequelize();
+const userRepository = new UserRepositorySequelize();
+const createPollService = new CreatePollService(pollRepository);
+const voteService = new VoteService(pollRepository, userRepository);
 
-  return {
+
+export const pollResolvers = {
+  
     Query: {
       // Get all polls for the authenticated user
       polls: async (_: any, __: any, context: GraphQLContext) => {
@@ -344,7 +345,6 @@ export const createPollResolvers = (
         return await pollRepository.getPollById(invitation.pollId);
       },
     },
-  };
 };
 
 
