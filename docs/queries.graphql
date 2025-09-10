@@ -1,0 +1,88 @@
+# The below are GraphQL Queries and Mutations merely for Testing
+
+# Login
+mutation Login {
+  login(email: "admin@example.com", password: "password123") {
+    user {
+      id
+      email
+    }
+    token # ← COPY THIS TOKEN FOR ALL OTHER REQUESTS
+  }
+}
+
+#Create open poll(No invitations needed)
+mutation CreateOpenPoll {
+  createPoll(
+    input: {
+      title: "Best Programming Language 2024"
+      accessType: OPEN
+      allowInviteEmails: false
+      questions: [
+        {
+          text: "Which language do you enjoy working with most?"
+          options: ["JavaScript", "Python", "Java", "Go", "Rust"]
+        }
+      ]
+      invitedEmails: [] # Empty for OPEN polls
+    }
+  ) {
+    poll {
+      id
+      title
+      accessType
+      createdAt
+    }
+    questions {
+      id
+      text
+    }
+    options {
+      id
+      text
+      questionId
+    }
+    inviteTokens # Will be empty for OPEN polls
+  }
+}
+
+#Create closed poll(with invitations)
+mutation CreateClosedPoll {
+  createPoll(
+    input: {
+      title: "Team Satisfaction Survey"
+      accessType: CLOSED
+      allowInviteEmails: true
+      questions: [
+        {
+          text: "How satisfied are you with our work environment?"
+          options: ["Very Satisfied", "Satisfied", "Neutral", "Unsatisfied"]
+        }
+        {
+          text: "What could we improve?"
+          options: ["Communication", "Tools", "Processes", "Work-life balance"]
+        }
+      ]
+      invitedEmails: [
+        "user1@company.com"
+        "user2@company.com"
+        "user3@company.com"
+      ]
+    }
+  ) {
+    poll {
+      id
+      title
+      accessType
+    }
+    questions {
+      id
+      text
+    }
+    options {
+      id
+      text
+    }
+    inviteTokens # ← COPY THESE TOKENS FOR VOTING LATER
+  }
+}
