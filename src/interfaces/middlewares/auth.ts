@@ -1,4 +1,3 @@
-// src/interfaces/middleware/auth.ts
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { env } from '../../shared';
@@ -17,7 +16,7 @@ export const authenticateToken = (req: AuthenticatedRequest, res: Response, next
   if (!authHeader) {
     return next();
   }
-  //console.log('Auth Header:', authHeader); To check for an issue
+  // console.log('Auth Header:', authHeader);  check for an issue
   const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
 
   if (!token) {

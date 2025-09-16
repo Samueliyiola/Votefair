@@ -7,7 +7,7 @@ type Poll {
   allowInviteEmails: Boolean!
   options: [String!]!
   invitedEmails: [String!]
-  questions: [Question!]!
+  questions: [Question!]
   votes: [Vote!]!
   createdAt: String!
   updatedAt: String!
