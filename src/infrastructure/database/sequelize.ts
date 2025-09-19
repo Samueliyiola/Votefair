@@ -1,6 +1,6 @@
 import { Sequelize } from 'sequelize';
 import {env} from "../../shared"
-import {setupAssociations} from "./associations";
+// import {setupAssociations} from "./associations";
 const sequelize = new Sequelize(
   env.DATABASE_NAME || 'postgres',
   env.DATABASE_USER || 'postgres',

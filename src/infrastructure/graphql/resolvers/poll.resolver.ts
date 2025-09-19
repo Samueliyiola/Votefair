@@ -4,6 +4,8 @@ import { VoteService } from '../../../application/services/vote/VoteService';
 import {UserRepositorySequelize} from "../../repositories/UserRepositorySequelize";
 import { PollRepositorySequelize } from '../../repositories/PollRepositorySequelize';
 
+import {PollModel, UserModel, QuestionModel, OptionModel} from "../../database/models/index"
+
 interface GraphQLContext {
   user?: {
     id: string;
@@ -16,7 +18,6 @@ const pollRepository = new PollRepositorySequelize();
 const userRepository = new UserRepositorySequelize();
 const createPollService = new CreatePollService(pollRepository);
 const voteService = new VoteService(pollRepository, userRepository);
-
 
 export const pollResolvers = {
   
@@ -31,7 +32,27 @@ export const pollResolvers = {
       poll: async (_: any, { id }: { id: string }, context: GraphQLContext) => {
         if (!context?.user?.id) throw new Error('Authentication required');
         
-        const poll = await pollRepository.getPollById(id);
+        // const poll = await pollRepository.getPollById(id);
+        const poll =  await PollModel.findByPk(id, {
+          include: [
+            {
+              model: UserModel,
+              as: "creator", // must match association
+              attributes: ["id", "email"],
+            },
+            {
+              model: QuestionModel,
+              as: "questions",
+              include: [
+                {
+                  model: OptionModel,
+                  as: "options",
+                },
+              ],
+            },
+          ],
+        });
+        console.log(poll?.createdBy)
         if (!poll) throw new Error('Poll not found');
         
         return poll;

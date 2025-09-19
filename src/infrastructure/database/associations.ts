@@ -72,7 +72,7 @@ export const setupAssociations = () => {
     as: 'poll' 
   });
 
-  // User ↔ Poll (One-to-Many) - If you have UserModel
+  // User ↔ Poll (One-to-Many)
   UserModel.hasMany(PollModel, { 
     foreignKey: 'createdBy', 
     as: 'polls',
