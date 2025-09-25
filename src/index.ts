@@ -1,12 +1,11 @@
 import 'dotenv/config';
 import { createServer } from './interfaces/graphql/server';
-// import sequelize from './infrastructure/database/sequelize';
 import { sequelize } from './infrastructure/database/models';
 const PORT = process.env.PORT || 4000;
 
 async function bootstrap() {
   try {
-    await sequelize.sync({ alter: true });
+    await sequelize.sync({ force: true });
     console.log('✅ Database connected');
   } catch (err) {
     console.error('❌ Unable to connect to DB', err);

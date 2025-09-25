@@ -59,6 +59,7 @@ input CreatePollInput {
   allowInviteEmails: Boolean!
   questions: [QuestionInput!]!
   invitedEmails: [String!]
+  expiresAt: String!
 }
 
 input QuestionInput {
@@ -81,6 +82,29 @@ type CreatePollResponse {
   inviteTokens: [String!]!
 }
 
+type PollResult {
+  pollId: ID!
+  title: String!
+  questions: [QuestionResult!]!
+}
+
+type QuestionResult {
+  questionId: ID!
+  text: String!
+  options: [OptionResult!]!
+}
+
+type OptionResult {
+  optionId: ID!
+  text: String!
+  voteCount: Int!
+  percentage: Float!
+}
+
+extend type Query {
+  pollResults(pollId: ID!): PollResult!
+}
+
 # Queries
 type Query {
   # Get all polls for the authenticated user
@@ -93,7 +117,8 @@ type Query {
   myPolls: [Poll!]!
 
   # Get results for a specific poll (votes)
-  pollResults(pollId: ID!): [Vote!]!
+  # pollResults(pollId: ID!): [Vote!]!
+  # pollResults(pollId: ID!): PollResult!
 
   # Get invitations for a poll
   pollInvitations(pollId: ID!): [Invitation!]!

@@ -11,6 +11,6 @@ export class Poll {
         public options: string[], // option texts (for convenience)
         public invitedEmails?: string[], // stored on model for quick access
         public createdAt?: Date,
-        public updatedAt?: Date
+        public expiresAt?: Date
     ) {}
 }

@@ -37,7 +37,7 @@ export const pollResolvers = {
           include: [
             {
               model: UserModel,
-              as: "creator", // must match association
+              as: "creator", 
               attributes: ["id", "email"],
             },
             {
@@ -64,19 +64,60 @@ export const pollResolvers = {
         return await pollRepository.getPollsByUser(context.user.id);
       },
 
-      // Get results for a specific poll
+      // Get results for a specific poll (votes)
       pollResults: async (_: any, { pollId }: { pollId: string }, context: GraphQLContext) => {
-        if (!context?.user?.id) throw new Error('Authentication required');
-        
+        if (!context?.user?.id) throw new Error("Authentication required");
+
         const poll = await pollRepository.getPollById(pollId);
-        if (!poll) throw new Error('Poll not found');
-        
+        if (!poll) throw new Error("Poll not found");
+
         if (poll.createdBy !== context.user.id) {
-          throw new Error('Only poll creator can view results');
+          throw new Error("Only poll creator can view results");
         }
-        
-        return await pollRepository.getVotesByPoll(pollId);
+        //Allows checking of results only after voting has ended!
+        if (poll.expiresAt && new Date() < new Date(poll.expiresAt)) {
+          throw new Error("Poll results are only available after voting ends.");
+        }
+
+
+        // Fetch poll data
+        const questions = await pollRepository.getQuestionsByPoll(pollId);
+        const options = await pollRepository.getOptionsByPoll(pollId);
+        const votes = await pollRepository.getVotesByPoll(pollId);
+
+        // Group options by question
+        const questionsWithResults = questions.map((q: any) => {
+          const questionOptions = options.filter((o: any) => o.questionId === q.id);
+          const totalVotes = votes.filter((v: any) =>
+            questionOptions.some((o: any) => o.id === v.optionId)
+          ).length;
+
+          const optionResults = questionOptions.map((option: any) => {
+            const voteCount = votes.filter((v: any) => v.optionId === option.id).length;
+            const percentage = totalVotes > 0 ? (voteCount / totalVotes) * 100 : 0;
+
+            return {
+              optionId: option.id,
+              text: option.text,
+              voteCount,
+              percentage: Number(percentage.toFixed(2)),
+            };
+          });
+
+          return {
+            questionId: q.id,
+            text: q.text,
+            options: optionResults,
+          };
+        });
+
+        return {
+          pollId: poll.id,
+          title: poll.title,
+          questions: questionsWithResults,
+        };
       },
+
 
       // Get invitations for a poll
       pollInvitations: async (_: any, { pollId }: { pollId: string }, context: GraphQLContext) => {
@@ -152,13 +193,23 @@ export const pollResolvers = {
           allowInviteEmails: input.allowInviteEmails,
           questions: input.questions,
           invitedEmails: input.invitedEmails,
+          expiresAt: input.expiresAt,
         });
       },
 
       // Vote on a poll
       vote: async (_: any, { input }: any, context: GraphQLContext) => {
         if (!context?.user?.id) throw new Error('Authentication required');
-        
+
+        //To avoid users voting after the poll has expired
+        const poll = await pollRepository.getPollById(input.pollId);
+        if (!poll) throw new Error('Poll not found');
+        // if (poll.accessType === 'CLOSED') throw new Error('Poll is closed for voting');
+        if (poll.expiresAt && new Date() > new Date(poll.expiresAt)) {
+          throw new Error("Cannot vote anymore, Poll is closed.");
+        }
+
+        //main vote service
         await voteService.execute(
           input.pollId,
           input.questionId,
@@ -367,121 +418,3 @@ export const pollResolvers = {
       },
     },
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// import * as graphqlUpload from "graphql-upload";
-// import { parse } from "csv-parse";
-// import fs from "fs";
-// import path from "path";
-// import PollModel from "../../database/models/PollModel";
-// import QuestionModel from "../../database/models/QuestionModel";
-// import OptionModel from "../../database/models/OptionModel";
-// import { CreatePollWithInvitesService } from "../../../application/services/poll/CreatePollWithInvitesService";
-// import { VoteService } from "../../../application/services/vote/VoteService";
-// import { normalizeAndDedupEmails } from "../../utils/normalizeEmails";
-
-// async function extractEmailsFromUpload(file: any): Promise<string[]> {
-//   const { createReadStream, filename } = await file;
-//   const tempPath = path.join(__dirname, "../../../uploads", `${Date.now()}-${filename}`);
-//   await new Promise((resolve, reject) => {
-//     const stream = createReadStream();
-//     const out = fs.createWriteStream(tempPath);
-//     stream.pipe(out);
-//     out.on("finish", resolve);
-//     out.on("error", reject);
-//   });
-
-//   const emails: string[] = [];
-//   await new Promise<void>((resolve, reject) => {
-//     fs.createReadStream(tempPath)
-//       .pipe(parse({ columns: true, relax_column_count: true, trim: true }))
-//       .on("data", (row: any) => {
-//         const value = row.email ?? Object.values(row)[0];
-//         if (value) emails.push(value);
-//       })
-//       .on("end", () => resolve())
-//       .on("error", (err) => reject(err));
-//   });
-
-//   fs.unlinkSync(tempPath);
-//   return emails;
-// }
-
-// const createService = new CreatePollWithInvitesService();
-// const voteService = new VoteService();
-
-// export const pollResolvers = {
-//   Upload: graphqlUpload.GraphQLUpload,
-
-//   Query: {
-//     pollsForUser: async (_: any, __: any, ctx: any) => {
-//       if (!ctx.user) return [];
-//       const email = (ctx.user.email || "").toLowerCase();
-//       const all = await PollModel.findAll({ order: [["createdAt", "DESC"]] });
-//       return all.filter((p) => Array.isArray(p.invitedEmails) ? p.invitedEmails.map((e: string) => e.toLowerCase()).includes(email) || p.accessType === "OPEN" : p.accessType === "OPEN");
-//     },
-
-//     poll: async (_: any, { id }: any, ctx: any) => {
-//       const poll = await PollModel.findByPk(id);
-//       if (!poll) return null;
-//       // if closed, ensure user is invited or admin
-//       if (poll.accessType === "CLOSED") {
-//         if (!ctx.user) throw new Error("Not authorized");
-//         const invited = Array.isArray(poll.invitedEmails) ? poll.invitedEmails.map((e: string) => e.toLowerCase()) : [];
-//         if (ctx.user.role !== "ADMIN" && !invited.includes(ctx.user.email.toLowerCase())) {
-//           throw new Error("You are not invited to this poll");
-//         }
-//       }
-//       return poll;
-//     },
-//   },
-
-//   Mutation: {
-//     createPollWithCSV: async (_: any, { input, file }: any, ctx: any) => {
-//       if (!ctx.user) throw new Error("Unauthorized");
-
-//       // extract emails from CSV
-//       const rawEmails = await extractEmailsFromUpload(file);
-//       const invitedEmails = normalizeAndDedupEmails(rawEmails);
-
-//       const poll = await createService.execute(ctx.user, {
-//         title: input.title,
-//         description: input.description ?? null,
-//         accessType: input.accessType,
-//         allowInviteEmails: input.allowInviteEmails ?? true,
-//         questions: input.questions,
-//         invitedEmails,
-//       });
-
-//       return { poll, invitedCount: invitedEmails.length };
-//     },
-
-//     vote: async (_: any, { pollId, questionId, optionId }: any, ctx: any) => {
-//       if (!ctx.user) throw new Error("Authentication required");
-//       const vote = await voteService.vote({ id: ctx.user.id, email: ctx.user.email }, pollId, questionId, optionId);
-//       return vote;
-//     },
-//   },
-// };

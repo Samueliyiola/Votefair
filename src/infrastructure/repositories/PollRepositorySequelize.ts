@@ -57,6 +57,7 @@ export class PollRepositorySequelize implements IPollRepository {
     return await OptionModel.findAll({
       include: [{
         model: QuestionModel,
+        as: "question",
         where: { pollId },
         attributes: []
       }]

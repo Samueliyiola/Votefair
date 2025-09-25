@@ -16,6 +16,7 @@ interface CreatePollInput {
     options: string[];
   }>;
   invitedEmails?: string[];
+  expiresAt?: Date;
 }
 
 export class CreatePollService {
@@ -35,6 +36,7 @@ export class CreatePollService {
       allowInviteEmails: input.allowInviteEmails,
       options: input.questions.flatMap(q => q.options),
       invitedEmails: input.invitedEmails,
+      expiresAt: input.expiresAt!,
       // invitedEmails: input.invitedEmails ?? [],
     });
 
