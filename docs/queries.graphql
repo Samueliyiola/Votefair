@@ -1,4 +1,4 @@
-# The below are GraphQL Queries and Mutations merely for Testing
+# The below are demo GraphQL Queries and Mutations merely for Testing
 
 # Login
 mutation Login {
@@ -13,20 +13,20 @@ mutation Login {
 
 #Create open poll(No invitations needed)
 mutation CreateOpenPoll {
-  createPoll(
-    input: {
-      title: "Best Programming Language 2024"
-      accessType: OPEN
-      allowInviteEmails: false
-      questions: [
-        {
-          text: "Which language do you enjoy working with most?"
-          options: ["JavaScript", "Python", "Java", "Go", "Rust"]
-        }
-      ]
-      invitedEmails: [] # Empty for OPEN polls
-    }
-  ) {
+  createPoll(input: {
+    title: "Best Programming Language 2024",
+    accessType: OPEN,
+    allowInviteEmails: false,
+    questions: [
+      {
+        text: "Which language do you enjoy working with most?",
+        options: ["JavaScript", "Python", "Java", "Go", "Rust"]
+      }
+    ],
+    invitedEmails: [],  # Empty for OPEN polls
+    expiresAt: "2025-09-30T12:15:00Z"
+
+  }) {
     poll {
       id
       title
@@ -40,36 +40,30 @@ mutation CreateOpenPoll {
     options {
       id
       text
-      questionId
     }
-    inviteTokens # Will be empty for OPEN polls
+    inviteTokens  # Will be empty for OPEN polls
   }
 }
 
 #Create closed poll(with invitations)
 mutation CreateClosedPoll {
-  createPoll(
-    input: {
-      title: "Team Satisfaction Survey"
-      accessType: CLOSED
-      allowInviteEmails: true
-      questions: [
-        {
-          text: "How satisfied are you with our work environment?"
-          options: ["Very Satisfied", "Satisfied", "Neutral", "Unsatisfied"]
-        }
-        {
-          text: "What could we improve?"
-          options: ["Communication", "Tools", "Processes", "Work-life balance"]
-        }
-      ]
-      invitedEmails: [
-        "user1@company.com"
-        "user2@company.com"
-        "user3@company.com"
-      ]
-    }
-  ) {
+  createPoll(input: {
+    title: "Team Satisfaction Survey",
+    accessType: CLOSED,
+    allowInviteEmails: true,
+    expiresAt: "2025-10-01T23:59:59Z",
+    questions: [
+      {
+        text: "How satisfied are you with our work environment?",
+        options: ["Very Satisfied", "Satisfied", "Neutral", "Unsatisfied"]
+      },
+      {
+        text: "What could we improve?",
+        options: ["Communication", "Tools", "Processes", "Work-life balance"]
+      }
+    ],
+    invitedEmails: ["user1@company.com", "user2@company.com", "user3@company.com"]
+  }) {
     poll {
       id
       title
@@ -83,6 +77,82 @@ mutation CreateClosedPoll {
       id
       text
     }
-    inviteTokens # ← COPY THESE TOKENS FOR VOTING LATER
+    inviteTokens  # ← COPY THESE TOKENS FOR VOTING LATER
+  }
+}
+
+# GET MY POLLS
+query GetMyPolls {
+  myPolls {
+    id
+    title
+    accessType
+    createdAt
+    }
+  }
+}
+
+# get details about a poll that has been created
+query GetPollDetails {
+  poll(id: "pollID_HERE") {
+    id
+    title
+    accessType
+
+    questions {
+      id
+      text
+      options {
+        id
+        text
+      }
+    }
+  }
+}
+
+
+# Get the options for a specific question in a poll
+query GetQuestionOptions {
+  questionOptions(questionId: "pollID_HERE") {
+    id
+    text
+  }
+}
+
+# To vote in an open poll
+mutation VoteOpenPoll {
+  vote(input: {
+    pollId: "pollId_HERE",
+    questionId: "questionId_HERE", 
+    optionId: "optionId_HERE"
+    # inviteToken: null  # ← OMIT THIS FOR OPEN POLLS
+  })
+}
+
+# To vote in a closed poll (use one of the invite tokens from poll creation)
+mutation VoteClosedPoll {
+  vote(input: {
+    pollId: "CLOSED_POLL_ID",
+    questionId: "QUESTION_ID",
+    optionId: "OPTION_ID",
+    inviteToken: "INVITE_TOKEN_FROM_CREATE_POLL_RESPONSE"
+  })
+}
+
+# To see poll results after the poll has been finished
+query GetPollResults{
+  pollResults(pollId: "783e6e17-a55d-4253-9507-22ee7752c3cf") {
+
+    questions {
+      questionId
+      text
+      options {
+        optionId
+        text
+        voteCount
+        percentage
+      }
+    }
+  }
   }
 }
